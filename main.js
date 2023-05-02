@@ -1,3 +1,60 @@
+// validation function
+const valid = function(product) {
+    return new Proxy(product, {
+        get: function(obj, prop) {
+            if(!obj[prop]) {
+               return `${prop} dosen't exist on the target object.`; 
+            } else {
+                console.log(`The ${prop} is ${obj[prop]}.`);
+            }
+        },
+        set: function(obj, prop, value) {
+            if((prop === "productPrice" || prop === "productId") && typeof value !== "number") {
+                return `please provide numeric value for ${prop} property`;
+            }
+            else {
+                obj[prop] = value;
+            }
+        }
+    });
+}
+const addProduct = function() {
+    // get all details for a product
+    const productForm = document.querySelector(".create-product");
+    productForm.addEventListener("submit", event => {
+
+        event.preventDefault();
+
+        const productName = document.getElementById("product-name").value;
+        const productDescription = document.getElementById("product-description").value;
+        const productPrice = document.getElementById("product-price").value;
+        const productImage = document.getElementById("product-image").files[0];
+        const productId = localStorage.length + 1;
+
+        console.log(document.getElementById("product-image").size);
+        
+        const product = {};
+        const productProxy = valid(product);
+
+        //set properties to object
+        productProxy.productName = productName;
+        productProxy.productDescription = productDescription;
+        console.log(productProxy.productPrice = productPrice);
+        productProxy.productId = productId;
+
+        const reader = new FileReader();
+        reader.readAsDataURL(productImage);
+
+        reader.addEventListener('load', () => {
+            // Get the data URL of the image file
+            const imageURL = reader.result;
+            productProxy.productImageUrl = imageURL;  
+            
+            console.log(productProxy.productPrice);
+        });
+    });
+}
+
 // route functionality
 const urlPageTitle = "Prodcut";
 const navBar = document.querySelector("nav");
@@ -56,8 +113,8 @@ const urlLocationHandler = async () => {
 	// set the title of the document to the title of the route
 	document.title = route.title;
 
-    if(location === "/images") {
-        carousel();
+    if(location === "/") {
+        addProduct();
     }
 };
 
