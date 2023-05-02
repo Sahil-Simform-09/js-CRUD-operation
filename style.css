@@ -1,0 +1,99 @@
+/*------------- default style --------------*/
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Roboto:wght@100;300;400;500;700;900&display=swap');
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html {
+    font-size: 62.5%;
+    font-family: 'Open Sans', sans-serif;
+    font-family: 'Poppins', sans-serif;
+}
+li {
+    list-style: none;
+}
+a {
+    text-decoration: none;
+    color: brown;
+}
+
+/*------------- navbar style --------------*/
+.navbar {
+    padding: 2rem 1.5rem;
+    width: 100%;
+    background-color: rgba(161, 150, 150, 0.212);
+}
+.hamburger {
+    display: none;
+}
+.bar {
+    display: block;
+    width: 25px;
+    height: 3px;
+    margin: 5px auto;
+    background-color: #101010;
+}
+.nav-menu {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+.nav-item {
+    margin-left: 5rem;
+}
+.nav-link{
+    font-size: 2rem;
+    font-weight: 400;
+}
+.nav-link:hover, button:hover{
+    color:rgba(145, 22, 22, 0.678);
+}
+.nav-logo img{
+    width: 70%;
+}
+
+/*------------- form style --------------*/
+.content, form, .form-feild {
+    display: flex;
+    justify-content: center; 
+}
+form {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: calc(75px + 3%);
+    background-color: rgba(161, 150, 150, 0.103);
+    padding: 2%;
+}
+label {
+    margin-top: 1rem;
+    color: brown;
+    font-size: 2rem;
+}
+.form-feild {
+    flex-direction: column;
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    width: 30%;
+}
+.form-feild * {
+    padding: 0.5rem;
+    font-size: 1.8rem;
+}
+.form-feild > button {
+    width: 70%;
+    height: 40px;
+}
+textarea {
+    height: 10rem;
+}
+button {
+    background-color: rgba(161, 150, 150, 0.212);
+    color: brown;
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    cursor: pointer;
+} 
