@@ -1,16 +1,17 @@
 // validation function
+const showError = function(error) { 
+    console.log(error);
+}
 const valid = function(product) {
     return new Proxy(product, {
         get: function(obj, prop) {
             if(!obj[prop]) {
-               return `${prop} dosen't exist on the target object.`; 
-            } else {
-                console.log(`The ${prop} is ${obj[prop]}.`);
+               showError(`${prop} dosen't exist on the target object.`); 
             }
         },
         set: function(obj, prop, value) {
-            if((prop === "productPrice" || prop === "productId") && typeof value !== "number") {
-                return `please provide numeric value for ${prop} property`;
+            if(prop === "productPrice" && typeof value !== "number") {
+                showError(`please provide numeric value for ${prop} property`);
             }
             else {
                 obj[prop] = value;
@@ -18,6 +19,29 @@ const valid = function(product) {
         }
     });
 }
+
+// genrate umique Id
+const genrateId = function() {
+    const now = new Date(); // create a new Date object with the current date and time
+
+    const year = now.getFullYear();
+    const month = now.getMonth(); 
+    const day = now.getDate();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds(); 
+
+    // format the date and time as a string (e.g. "2023-05-03 12:34:56")
+    const dateTimeString = `${year}${month.toString()}${day.toString()}${hours.toString()}${minutes.toString()}${seconds.toString()}`;
+
+    return dateTimeString;
+}
+// convert byte to megabyte
+const bytesToMegabytes = function(bytes) {
+    const megabytes = bytes / (1024 * 1024);
+    return megabytes;
+}
+
 const addProduct = function() {
     // get all details for a product
     const productForm = document.querySelector(".create-product");
@@ -27,11 +51,9 @@ const addProduct = function() {
 
         const productName = document.getElementById("product-name").value;
         const productDescription = document.getElementById("product-description").value;
-        const productPrice = document.getElementById("product-price").value;
+        const productPrice = Number(document.getElementById("product-price").value);
         const productImage = document.getElementById("product-image").files[0];
-        const productId = localStorage.length + 1;
-
-        console.log(document.getElementById("product-image").size);
+        const productId = genrateId();
         
         const product = {};
         const productProxy = valid(product);
@@ -39,8 +61,8 @@ const addProduct = function() {
         //set properties to object
         productProxy.productName = productName;
         productProxy.productDescription = productDescription;
-        console.log(productProxy.productPrice = productPrice);
         productProxy.productId = productId;
+        productProxy.productPrice = productPrice;
 
         const reader = new FileReader();
         reader.readAsDataURL(productImage);
@@ -50,8 +72,34 @@ const addProduct = function() {
             const imageURL = reader.result;
             productProxy.productImageUrl = imageURL;  
             
-            console.log(productProxy.productPrice);
+            localStorage.setItem(productId.toString(), JSON.stringify(product));
         });
+    });
+}
+const viewProduct = function() {
+
+    // get productContainer
+    let productContainer = document.querySelector(".all-product");
+
+
+    // get all keys
+    const keys = Object.keys(localStorage);
+    keys.forEach( async key => {
+
+        const productString = await localStorage.getItem(key);
+        const oneProduct = JSON.parse(productString);
+    
+        const productName = oneProduct.productName;
+        const productDescription = oneProduct.productDescription;
+        const productPrice = oneProduct.productPrice;
+        const productImageUrl = oneProduct.productImageUrl;
+
+        productContainer.innerHTML += `<div class="product-card">
+                                        <p class="name">${productName}</p>
+                                        <img src="${productImageUrl}" alt="${productName}-image">
+                                        <p class="price">${productPrice}</p>
+                                        <p class="desc">${productDescription}</p>
+                                     </div>`
     });
 }
 
@@ -65,10 +113,6 @@ navBar.addEventListener("click", event => {
 
 // create an object that maps the url to the template, title, and description
 const urlRoutes = {
-	404: {
-		template: "/templates/404.html",
-		title: "404 | " + urlPageTitle,
-	},
 	"/": {
 		template: "/templates/index.html",
 		title: "create | " + urlPageTitle,
@@ -89,21 +133,23 @@ const urlRoute = (event) => {
 
 	// window.history.pushState(state, unused, target link);
 	window.history.pushState({}, "", event.target.href);
+    console.log(event.target.href);
 	urlLocationHandler();
 };
 
 // create a function that handles the url location
 const urlLocationHandler = async () => {
+
 	const location = window.location.pathname; // get the url path
 	// if the path length is 0, set it to primary page route
 
     console.log(location);
-	if (location.length == 0) {
-		location = "/";
-	}
+	// if (location.length == 0) {
+	// 	location = "/";
+	// }
 
 	// get the route object from the urlRoutes object
-	const route = urlRoutes[location] || urlRoutes["404"];
+	const route = urlRoutes[location];
 
 	// get the html from the template
 	const html = await fetch(route.template).then((response) => response.text());
@@ -113,8 +159,17 @@ const urlLocationHandler = async () => {
 	// set the title of the document to the title of the route
 	document.title = route.title;
 
-    if(location === "/") {
-        addProduct();
+    switch (location) {
+        case "/":
+            addProduct();
+            break;
+
+        case "/view":
+            viewProduct();
+            break;  
+
+        default:
+            break;
     }
 };
 
