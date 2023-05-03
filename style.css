@@ -18,40 +18,95 @@ a {
     color: brown;
 }
 
-/*------------- navbar style --------------*/
-.navbar {
-    padding: 2rem 1.5rem;
+/*------------- header style --------------*/
+.header {
+    background-color: rgb(253, 249, 249);
+    text-align: center;
+    z-index: 1;
     width: 100%;
-    background-color: rgba(161, 150, 150, 0.212);
 }
-.hamburger {
+.header, .new-product {
+    position: fixed;
+} 
+
+/*------------- main container style --------------*/
+.main-content {
+    margin: 20px;
+}
+.main-content {
+    width: 60%;
+}
+.view {
     display: none;
 }
-.bar {
-    display: block;
-    width: 25px;
-    height: 3px;
-    margin: 5px auto;
-    background-color: #101010;
+
+/*------------- create new product button style --------------*/
+.new-product, .main-content{
+    margin: 170px 10px 10px 10px;
 }
-.nav-menu {
+.new-product {
+    left: 40px;
+    right: 00px;
+}
+.new-product button {
+    width: 150px;
+    font-size: 1.5rem
+}
+
+/*------------- product view style --------------*/
+.view-product {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.sort-filter {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 190px;
+    left: 1100px;
+}
+.filter{
+    width: 100%;
+    display: flex;
+    margin: 25px;
+    padding: 10px;
+    background-color: rgb(253, 249, 249);
+}
+.filter svg {
+    width: 30px;
+    height: 30px;
+}
+.filter input {
+    width: 100%;
+    padding: 10px;
+}
+.sort select{
+    padding: 10px;
+    margin-left: 25px;
+}
+.product-container {
+    width: 700px;
+}
+.product-card {
     display: flex;
     justify-content: space-around;
-    align-items: center;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    margin: 20px 20px 20px 0;
+    padding: 10px;
+    font-size: 1.5rem;
 }
-.nav-item {
-    margin-left: 5rem;
+.product-card img {
+    width: 400px;
+    height: 200px;
 }
-.nav-link{
-    font-size: 2rem;
-    font-weight: 400;
+.buttons *{
+    margin: 20px 0px;
 }
-.nav-link:hover, button:hover{
-    color:rgba(145, 22, 22, 0.678);
-}
-.nav-logo img{
-    width: 70%;
-}
+
 
 /*------------- form style --------------*/
 .content, form, .form-feild {
@@ -98,19 +153,3 @@ button {
     cursor: pointer;
 } 
 
-/*------------- product view style --------------*/
-.product-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background-color: #fff;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-    margin: 20px;
-    padding: 10px;
-    font-size: 1.5rem;
-}
-.product-card img {
-    width: 50%;
-}

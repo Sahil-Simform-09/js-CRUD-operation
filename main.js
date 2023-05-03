@@ -42,7 +42,50 @@ const bytesToMegabytes = function(bytes) {
     return megabytes;
 }
 
-const addProduct = function() {
+// get main content
+let mainContainer = document.querySelector(".main-content");
+
+//get buttons
+const createNewProductBtn = document.querySelector(".create");
+const viewProductsBtn = document.querySelector(".view");
+
+createNewProductBtn.addEventListener("click", event => {
+    mainContainer.innerHTML = `<form class="create-product">
+                                <div class="form-feild">
+                                    <label for="product-name">Product Name:</label>
+                                    <input type="text" id="product-name" name="product-name" required>
+                                </div>
+                                
+                                <div class="form-feild">
+                                    <label for="product-description">Product Description:</label>
+                                    <textarea id="product-description" name="product-description" required></textarea>
+                                </div>
+
+                                <div class="form-feild">
+                                    <label for="product-price">Product Price:</label>
+                                    <input type="number" id="product-price" name="product-price" required>
+                                </div>
+                                
+                                <div class="form-feild">
+                                    <label for="product-image">Product Image:</label>
+                                    <input type="file" id="product-image" name="product-image" accept="image/*" required>
+                                </div>
+                                
+                                <div class="form-feild">
+                                    <button type="submit" class="submit">Add Product</button>
+                                </div>
+                            </form>   
+                            `;
+    addOrEditProduct();
+});
+
+viewProductsBtn.addEventListener("click", () => {
+    createNewProductBtn.style.display = "block";
+    viewProductsBtn.style.display = "none";
+    viewProduct();
+})
+
+const addOrEditProduct = function() {
     // get all details for a product
     const productForm = document.querySelector(".create-product");
     productForm.addEventListener("submit", event => {
@@ -75,18 +118,39 @@ const addProduct = function() {
             localStorage.setItem(productId.toString(), JSON.stringify(product));
         });
     });
+
+    createNewProductBtn.style.display = "none";
+    viewProductsBtn.style.display = "block";
 }
 const viewProduct = function() {
 
-    // get productContainer
-    let productContainer = document.querySelector(".all-product");
+    mainContainer.innerHTML = `<div class="view-product">
+                                <div class="product-container">
+                                </div>
+                                <div class="sort-filter">
+                                    <div class="filter">
+                                        <input type="number" placeholder="Search Product By Id">
+                                        <button>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="search"><g data-name="Layer 2"><path d="m20.71 19.29-3.4-3.39A7.92 7.92 0 0 0 19 11a8 8 0 1 0-8 8 7.92 7.92 0 0 0 4.9-1.69l3.39 3.4a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42zM5 11a6 6 0 1 1 6 6 6 6 0 0 1-6-6z" data-name="search"></path></g></svg>
+                                        </button>
+                                    </div>
+                                    <div class="sort">
+                                    <label for="">Sort</label>
+                                        <select name="sorting" id="">
+                                            <option value="id">By Id</option>
+                                            <option value="name">By Name</option>
+                                            <option value="price">By Price</option>
+                                        </select>
+                                    </div>
+                            </div>
+                            </div>`
 
-
+    let productContainer = document.querySelector(".product-container");
     // get all keys
     const keys = Object.keys(localStorage);
-    keys.forEach( async key => {
+    keys.forEach(key => {
 
-        const productString = await localStorage.getItem(key);
+        const productString = localStorage.getItem(key);
         const oneProduct = JSON.parse(productString);
     
         const productName = oneProduct.productName;
@@ -95,83 +159,21 @@ const viewProduct = function() {
         const productImageUrl = oneProduct.productImageUrl;
 
         productContainer.innerHTML += `<div class="product-card">
-                                        <p class="name">${productName}</p>
-                                        <img src="${productImageUrl}" alt="${productName}-image">
-                                        <p class="price">${productPrice}</p>
-                                        <p class="desc">${productDescription}</p>
-                                     </div>`
+                                            <div class="item">
+                                                <p class="name">${productName}</p>
+                                                <img src="${productImageUrl}" alt="${productName}-image">
+                                                <p class="price">${productPrice}</p>
+                                                <p class="desc">${productDescription}</p>
+                                            </div>
+                                            <div class="buttons">
+                                                <div class="delete">
+                                                    <button><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" id="delete"><path fill="#000" d="M15 3a1 1 0 0 1 1 1h2a1 1 0 1 1 0 2H6a1 1 0 0 1 0-2h2a1 1 0 0 1 1-1h6Z"></path><path fill="#000" fill-rule="evenodd" d="M6 7h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7Zm3.5 2a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 1 0v-9a.5.5 0 0 0-.5-.5Zm5 0a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 1 0v-9a.5.5 0 0 0-.5-.5Z" clip-rule="evenodd"></path></svg></button>
+                                                </div>
+                                                <div class="edit">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="edit"><path d="M5,18H9.24a1,1,0,0,0,.71-.29l6.92-6.93h0L19.71,8a1,1,0,0,0,0-1.42L15.47,2.29a1,1,0,0,0-1.42,0L11.23,5.12h0L4.29,12.05a1,1,0,0,0-.29.71V17A1,1,0,0,0,5,18ZM14.76,4.41l2.83,2.83L16.17,8.66,13.34,5.83ZM6,13.17l5.93-5.93,2.83,2.83L8.83,16H6ZM21,20H3a1,1,0,0,0,0,2H21a1,1,0,0,0,0-2Z"></path></svg>
+                                                </div>
+                                            </div>
+                                      </div>`
     });
 }
-
-// route functionality
-const urlPageTitle = "Prodcut";
-const navBar = document.querySelector("nav");
-navBar.addEventListener("click", event => {
-    event.preventDefault();
-    urlRoute(event);
-});
-
-// create an object that maps the url to the template, title, and description
-const urlRoutes = {
-	"/": {
-		template: "/templates/index.html",
-		title: "create | " + urlPageTitle,
-	},
-	"/edit": {
-		template: "/templates/edit.html",
-		title: "Edit | " + urlPageTitle,
-	},
-	"/view": {
-		template: "/templates/view.html",
-		title: "View | " + urlPageTitle,
-	},
-}
-
-// create a function that watches the url and calls the urlLocationHandler
-const urlRoute = (event) => {
-	event.preventDefault();
-
-	// window.history.pushState(state, unused, target link);
-	window.history.pushState({}, "", event.target.href);
-    console.log(event.target.href);
-	urlLocationHandler();
-};
-
-// create a function that handles the url location
-const urlLocationHandler = async () => {
-
-	const location = window.location.pathname; // get the url path
-	// if the path length is 0, set it to primary page route
-
-    console.log(location);
-	// if (location.length == 0) {
-	// 	location = "/";
-	// }
-
-	// get the route object from the urlRoutes object
-	const route = urlRoutes[location];
-
-	// get the html from the template
-	const html = await fetch(route.template).then((response) => response.text());
-
-	// set the content of the content div to the html
-	document.querySelector(".content").innerHTML = html;
-	// set the title of the document to the title of the route
-	document.title = route.title;
-
-    switch (location) {
-        case "/":
-            addProduct();
-            break;
-
-        case "/view":
-            viewProduct();
-            break;  
-
-        default:
-            break;
-    }
-};
-
-// call the urlLocationHandler function to handle the initial url
-urlLocationHandler();
+viewProduct();
