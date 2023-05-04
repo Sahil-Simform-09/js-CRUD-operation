@@ -33,19 +33,7 @@ const valid = function(product) {
 
 // genrate umique Id
 const genrateId = function() {
-    const now = new Date(); // create a new Date object with the current date and time
-
-    const year = now.getFullYear();
-    const month = now.getMonth(); 
-    const day = now.getDate();
-    const hours = now.getHours();
-    const minutes = now.getMinutes();
-    const seconds = now.getSeconds(); 
-
-    // format the date and time as a string (e.g. "2023-05-03 12:34:56")
-    const dateTimeString = `${year}${month.toString()}${day.toString()}${hours.toString()}${minutes.toString()}${seconds.toString()}`;
-
-    return dateTimeString;
+    return Date.now();
 }
 // convert byte to megabyte
 const bytesToMegabytes = function(bytes) {
@@ -54,21 +42,51 @@ const bytesToMegabytes = function(bytes) {
 }
 
 
-const addOrEditProduct = function(crearteOrEdit, editProductId) {
-    // get all details for a product
+const addOrEditProduct = function() {
+    
     const productForm = document.querySelector(".create-product");
+    let productName = document.getElementById("product-name"), 
+        productDescription = document.getElementById("product-description"), 
+        productPrice = document.getElementById("product-price"), 
+        productImage = document.getElementById("product-image");
+
+    //check form is for edit
+    let productIdToEdit, index;
+    if(location.search.length > 0) {
+        productIdToEdit = location.search.substring(1, location.search.length);
+        index = productsArray.findIndex(object => {
+            return object.productId === productIdToEdit;
+        });
+        const oneObject = productsArray.splice(index, 1)[0];
+        productName.value = oneObject.productName;
+        productDescription.value = oneObject.productDescription;
+        productPrice.value = oneObject.productPrice;
+        
+
+        let imageToEdit = document.querySelector("form img");
+        imageToEdit.style.display = "block";
+        imageToEdit.src =  oneObject.productImageUrl;
+
+        let submitButton = document.querySelector(".submit");
+        submitButton.innerHTML = "Update Product";
+    }
+
+    const formName = document.querySelector("form p");
+    formName.innerHTML = "Edit Product Here";
+
+    
     productForm.addEventListener("submit", event => {
 
         event.preventDefault();
-
-        const productName = document.getElementById("product-name").value;
-        const productDescription = document.getElementById("product-description").value;
-        const productPrice = Number(document.getElementById("product-price").value);
-        const productImage = document.getElementById("product-image").files[0];
-        const messageDiv = document.querySelector(".message");
-        const productId = genrateId();
-        const product = {};
-        const productProxy = valid(product);
+        // get all details for a product
+        productName = productName.value;
+        productDescription = productDescription.value;
+        productPrice = Number(productPrice.value);
+        productImage = productImage.files[0];
+        messageDiv = document.querySelector(".message");
+        productId = productIdToEdit !== undefined ? productIdToEdit : genrateId();
+        product = {};
+        productProxy = valid(product);
 
         //set properties to object
         productProxy.productName = productName;
@@ -88,7 +106,7 @@ const addOrEditProduct = function(crearteOrEdit, editProductId) {
             productsArray.push(product);
 
             const message = document.querySelector(".message");
-            message.innerHTML = "Product added successfully";
+            message.innerHTML = productIdToEdit !== undefined ? "Product updated successfully" : "Product added successfully";
             message.style.display = "block";
             setTimeout(() => {
                 message.style.display = "none";
@@ -184,10 +202,8 @@ const functionality = function() {
                         if(clickedButton.charAt(0) === "d") {
                             deleteProduct(clickedButton.substring(1, clickedButton.length), getDiv);
                         } else if(clickedButton.charAt(0) === "e") {
-                            // const formName = document.querySelector("form p");
-                            // formName.innerHTML = "Edit Product Here";
-                            // addOrEditProduct("edit", clickedButton.substring(1, clickedButton.length));
-                            // window.location.href = "/create.html";
+                            const newId = clickedButton.substring(1, clickedButton.length);
+                            window.location.href = "/create.html?" + newId;
                         }
                     }
                     break;
@@ -217,5 +233,5 @@ if(url === "/index.html") {
     functionality();
 } else if(url === "/create.html") {
     visisbleButton();
-    addOrEditProduct("create");
+    addOrEditProduct();
 }
