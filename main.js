@@ -1,3 +1,14 @@
+// array of all products
+const productsArray = [];
+const fillArray = function() {
+    if(productsArray.length === 0) {
+        let keys = Object.keys(localStorage);
+        keys.forEach( key => {
+            productsArray.push(JSON.parse(localStorage.getItem(key)));
+        });
+    }
+}
+fillArray();
 // validation function
 const showError = function(error) { 
     console.log(error);
@@ -42,50 +53,8 @@ const bytesToMegabytes = function(bytes) {
     return megabytes;
 }
 
-// get main content
-let mainContainer = document.querySelector(".main-content");
 
-//get buttons
-const createNewProductBtn = document.querySelector(".create");
-const viewProductsBtn = document.querySelector(".view");
-
-createNewProductBtn.addEventListener("click", event => {
-    mainContainer.innerHTML = `<form class="create-product">
-                                <div class="form-feild">
-                                    <label for="product-name">Product Name:</label>
-                                    <input type="text" id="product-name" name="product-name" required>
-                                </div>
-                                
-                                <div class="form-feild">
-                                    <label for="product-description">Product Description:</label>
-                                    <textarea id="product-description" name="product-description" required></textarea>
-                                </div>
-
-                                <div class="form-feild">
-                                    <label for="product-price">Product Price:</label>
-                                    <input type="number" id="product-price" name="product-price" required>
-                                </div>
-                                
-                                <div class="form-feild">
-                                    <label for="product-image">Product Image:</label>
-                                    <input type="file" id="product-image" name="product-image" accept="image/*" required>
-                                </div>
-                                
-                                <div class="form-feild">
-                                    <button type="submit" class="submit">Add Product</button>
-                                </div>
-                            </form>   
-                            `;
-    addOrEditProduct();
-});
-
-viewProductsBtn.addEventListener("click", () => {
-    createNewProductBtn.style.display = "block";
-    viewProductsBtn.style.display = "none";
-    viewProduct();
-})
-
-const addOrEditProduct = function() {
+const addOrEditProduct = function(crearteOrEdit, editProductId) {
     // get all details for a product
     const productForm = document.querySelector(".create-product");
     productForm.addEventListener("submit", event => {
@@ -96,8 +65,8 @@ const addOrEditProduct = function() {
         const productDescription = document.getElementById("product-description").value;
         const productPrice = Number(document.getElementById("product-price").value);
         const productImage = document.getElementById("product-image").files[0];
+        const messageDiv = document.querySelector(".message");
         const productId = genrateId();
-        
         const product = {};
         const productProxy = valid(product);
 
@@ -116,64 +85,137 @@ const addOrEditProduct = function() {
             productProxy.productImageUrl = imageURL;  
             
             localStorage.setItem(productId.toString(), JSON.stringify(product));
+            productsArray.push(product);
+
+            const message = document.querySelector(".message");
+            message.innerHTML = "Product added successfully";
+            message.style.display = "block";
+            setTimeout(() => {
+                message.style.display = "none";
+            }, 1500);
         });
+
     });
-
-    createNewProductBtn.style.display = "none";
-    viewProductsBtn.style.display = "block";
 }
-const viewProduct = function() {
+const createCard = function(oneProduct) {
 
-    mainContainer.innerHTML = `<div class="view-product">
-                                <div class="product-container">
-                                </div>
-                                <div class="sort-filter">
-                                    <div class="filter">
-                                        <input type="number" placeholder="Search Product By Id">
-                                        <button>
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="search"><g data-name="Layer 2"><path d="m20.71 19.29-3.4-3.39A7.92 7.92 0 0 0 19 11a8 8 0 1 0-8 8 7.92 7.92 0 0 0 4.9-1.69l3.39 3.4a1 1 0 0 0 1.42 0 1 1 0 0 0 0-1.42zM5 11a6 6 0 1 1 6 6 6 6 0 0 1-6-6z" data-name="search"></path></g></svg>
-                                        </button>
-                                    </div>
-                                    <div class="sort">
-                                    <label for="">Sort</label>
-                                        <select name="sorting" id="">
-                                            <option value="id">By Id</option>
-                                            <option value="name">By Name</option>
-                                            <option value="price">By Price</option>
-                                        </select>
-                                    </div>
-                            </div>
-                            </div>`
+    // add product into productsArray
+    return `<div class="product-card">
+            <div class="item">
+                <p class="name">Id: ${oneProduct.productId}</p>
+                <p class="name"> ${oneProduct.productName}</p>
+                <img src="${oneProduct.productImageUrl}" alt="${oneProduct.productName}-image">
+                <p class="price">${oneProduct.productPrice}</p>
+                <p class="desc">${oneProduct.productDescription}</p>
+            </div>
+            <div class="buttons">
+                <div class="delete" id="d${oneProduct.productId}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none"><path fill="#000" d="M15 3a1 1 0 0 1 1 1h2a1 1 0 1 1 0 2H6a1 1 0 0 1 0-2h2a1 1 0 0 1 1-1h6Z"></path><path fill="#000" fill-rule="evenodd" d="M6 7h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7Zm3.5 2a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 1 0v-9a.5.5 0 0 0-.5-.5Zm5 0a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 1 0v-9a.5.5 0 0 0-.5-.5Z" clip-rule="evenodd"></path></svg></button>
+                </div>
+                <div class="edit" id="e${oneProduct.productId}">
+                   
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5,18H9.24a1,1,0,0,0,.71-.29l6.92-6.93h0L19.71,8a1,1,0,0,0,0-1.42L15.47,2.29a1,1,0,0,0-1.42,0L11.23,5.12h0L4.29,12.05a1,1,0,0,0-.29.71V17A1,1,0,0,0,5,18ZM14.76,4.41l2.83,2.83L16.17,8.66,13.34,5.83ZM6,13.17l5.93-5.93,2.83,2.83L8.83,16H6ZM21,20H3a1,1,0,0,0,0,2H21a1,1,0,0,0,0-2Z"></path></svg>
+                  
+                </div>
+            </div>
+        </div>`;
+}
+const viewProduct = function(isSort) {
 
     let productContainer = document.querySelector(".product-container");
+    if(isSort) {
+        productContainer.innerHTML = "";
+    }
     // get all keys
-    const keys = Object.keys(localStorage);
-    keys.forEach(key => {
-
-        const productString = localStorage.getItem(key);
-        const oneProduct = JSON.parse(productString);
-    
-        const productName = oneProduct.productName;
-        const productDescription = oneProduct.productDescription;
-        const productPrice = oneProduct.productPrice;
-        const productImageUrl = oneProduct.productImageUrl;
-
-        productContainer.innerHTML += `<div class="product-card">
-                                            <div class="item">
-                                                <p class="name">${productName}</p>
-                                                <img src="${productImageUrl}" alt="${productName}-image">
-                                                <p class="price">${productPrice}</p>
-                                                <p class="desc">${productDescription}</p>
-                                            </div>
-                                            <div class="buttons">
-                                                <div class="delete">
-                                                    <button><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" id="delete"><path fill="#000" d="M15 3a1 1 0 0 1 1 1h2a1 1 0 1 1 0 2H6a1 1 0 0 1 0-2h2a1 1 0 0 1 1-1h6Z"></path><path fill="#000" fill-rule="evenodd" d="M6 7h12v12a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7Zm3.5 2a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 1 0v-9a.5.5 0 0 0-.5-.5Zm5 0a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 1 0v-9a.5.5 0 0 0-.5-.5Z" clip-rule="evenodd"></path></svg></button>
-                                                </div>
-                                                <div class="edit">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" id="edit"><path d="M5,18H9.24a1,1,0,0,0,.71-.29l6.92-6.93h0L19.71,8a1,1,0,0,0,0-1.42L15.47,2.29a1,1,0,0,0-1.42,0L11.23,5.12h0L4.29,12.05a1,1,0,0,0-.29.71V17A1,1,0,0,0,5,18ZM14.76,4.41l2.83,2.83L16.17,8.66,13.34,5.83ZM6,13.17l5.93-5.93,2.83,2.83L8.83,16H6ZM21,20H3a1,1,0,0,0,0,2H21a1,1,0,0,0,0-2Z"></path></svg>
-                                                </div>
-                                            </div>
-                                      </div>`
+    productsArray.forEach( product => {
+        const productCardOne = createCard(product);
+        productContainer.innerHTML += productCardOne;
     });
 }
-viewProduct();
+const visisbleButton = function() {
+    const viewProductButton = document.querySelector(".view");
+    viewProductButton.style.display = "block";
+}
+const filterProduct = function() {
+    let productContainer = document.querySelector(".product-container");
+    let idFromInput = document.querySelector(".filter input").value;
+    
+    const index = productsArray.findIndex(object => {
+        return object.productId === idFromInput;
+    });
+    productContainer.innerHTML = createCard(productsArray.splice(index, 1)[0]);
+
+    visisbleButton();
+}
+const getclickedButton = function(event) {
+    const clickedButton = event.target;
+    if(clickedButton.id === "sort") {
+        return  document.getElementById("sort").value;
+    }
+    return clickedButton.id;
+}
+const sortProducts = function(byWhich) {
+    productsArray.sort((a,b) => (a[byWhich] > b[byWhich]) ? 1 : ((b[byWhich] > a[byWhich]) ? -1 : 0));
+}
+const functionality = function() {
+    let viewProductContainer = document.querySelector(".view-product");
+    viewProductContainer.addEventListener("click", event => {;
+        const clickedButton =  getclickedButton(event);
+        if(clickedButton.toString() !== "null") {
+            switch (clickedButton) {
+                case "filter-product":
+                    filterProduct();
+                    break;
+                case "id":
+                    sortProducts("productId");
+                    viewProduct(true);
+                    break;
+                case "price":
+                    sortProducts("productPrice");
+                    viewProduct(true);
+                    break;
+                case "name":
+                    sortProducts("productName");
+                    viewProduct(true);
+                    break;
+                case clickedButton:
+                    if(clickedButton.length > 0) {
+                        let getDiv = document.getElementById(clickedButton).parentNode.parentNode;
+                        if(clickedButton.charAt(0) === "d") {
+                            deleteProduct(clickedButton.substring(1, clickedButton.length), getDiv);
+                        } else if(clickedButton.charAt(0) === "e") {
+                            // const formName = document.querySelector("form p");
+                            // formName.innerHTML = "Edit Product Here";
+                            // addOrEditProduct("edit", clickedButton.substring(1, clickedButton.length));
+                            // window.location.href = "/create.html";
+                        }
+                    }
+                    break;
+                default:   
+                    break;
+            }
+        }
+    });
+}
+const deleteProduct = function(clickedButtonId, productCard) {
+    if(localStorage.length > 0) {
+        const productToDelete = JSON.parse(localStorage.getItem(clickedButtonId));
+        const index = productsArray.findIndex(object => {
+            return object.productId === clickedButtonId;
+        });
+        productsArray.splice(index, 1);
+        localStorage.removeItem(clickedButtonId);
+        productCard.remove();
+    } else {
+        showError("localstorage is empty");
+    }
+}
+
+const url = window.location.pathname;
+if(url === "/index.html") {
+    viewProduct(false);
+    functionality();
+} else if(url === "/create.html") {
+    visisbleButton();
+    addOrEditProduct("create");
+}

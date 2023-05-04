@@ -17,6 +17,9 @@ a {
     text-decoration: none;
     color: brown;
 }
+svg, svg *{
+    pointer-events: none;
+}
 
 /*------------- header style --------------*/
 .header {
@@ -27,6 +30,7 @@ a {
 }
 .header, .new-product {
     position: fixed;
+    top: 0;
 } 
 
 /*------------- main container style --------------*/
@@ -36,17 +40,16 @@ a {
 .main-content {
     width: 60%;
 }
-.view {
-    display: none;
-}
 
 /*------------- create new product button style --------------*/
-.new-product, .main-content{
+.main-content{
     margin: 170px 10px 10px 10px;
 }
 .new-product {
+    margin-top: 170px;
+}
+.new-product {
     left: 40px;
-    right: 00px;
 }
 .new-product button {
     width: 150px;
@@ -64,7 +67,7 @@ a {
     flex-direction: column;
     position: fixed;
     top: 190px;
-    left: 1100px;
+    left: 70%;
 }
 .filter{
     width: 100%;
@@ -103,10 +106,26 @@ a {
     width: 400px;
     height: 200px;
 }
-.buttons *{
+.edit, .delete {
     margin: 20px 0px;
 }
-
+.buttons *{
+    cursor: pointer;
+}
+.message {
+    background-color: rgb(94, 182, 94);
+    color: white;
+    width: 300px;
+    height: 30px;
+    z-index: 15;
+    display: none;
+    font-size: 1.5rem;
+    padding: 3px;
+}
+.view {
+    display: none;
+    top: 70px;
+}
 
 /*------------- form style --------------*/
 .content, form, .form-feild {
@@ -121,10 +140,12 @@ form {
     background-color: rgba(161, 150, 150, 0.103);
     padding: 2%;
 }
-label {
-    margin-top: 1rem;
+form p, label {
     color: brown;
     font-size: 2rem;
+}
+label {
+    margin-top: 1rem;
 }
 .form-feild {
     flex-direction: column;
