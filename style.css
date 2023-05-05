@@ -68,6 +68,7 @@ svg, svg *{
     position: fixed;
     top: 190px;
     left: 70%;
+    /* right: 100px; */
 }
 .filter{
     width: 100%;
@@ -111,6 +112,15 @@ svg, svg *{
 }
 .buttons *{
     cursor: pointer;
+}
+.item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.item *{
+    padding: 5px;
+    font-size: 1.5rem;
 }
 .message {
     background-color: rgb(94, 182, 94);

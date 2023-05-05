@@ -43,18 +43,22 @@ const valid = function(product) {
 const genrateId = function() {
     return Date.now();
 }
-// convert byte to megabyte
-const bytesToMegabytes = function(bytes) {
-    const megabytes = bytes / (1024 * 1024);
-    return megabytes;
+const generateMessage = function(message) {
+    let messageForNoProduct = document.querySelector(".product-container p");
+    messageForNoProduct.innerHTML = "No products are available";
 }
+// convert byte to megabyte
+// const bytesToMegabytes = function(bytes) {
+//     const megabytes = bytes / (1024 * 1024);
+//     return megabytes;
+// }
 
 const createCard = function(oneProduct) {
 
     // add product into productsArray
     return `<div class="product-card">
             <div class="item">
-                <p class="name">Id: ${oneProduct.productId}</p>
+                <p class="name">${oneProduct.productId}</p>
                 <p class="name"> ${oneProduct.productName}</p>
                 <img src="${oneProduct.productImageUrl}" alt="${oneProduct.productName}-image">
                 <p class="price">${oneProduct.productPrice}</p>
@@ -72,9 +76,11 @@ const createCard = function(oneProduct) {
             </div>
         </div>`;
 }
-const visisbleButton = function() {
+const visisbleButton = function(message) {
     const viewProductButton = document.querySelector(".view");
     viewProductButton.style.display = "block";
+
+    document.querySelector(".view button a").innerHTML = message;
 }
 const getclickedButton = function(event) {
     const clickedButton = event.target;
@@ -96,13 +102,12 @@ const addOrEditProduct = function() {
         productPrice = document.getElementById("product-price"), 
         productImage = document.getElementById("product-image");
 
-    //check form is for edit
+    //check form is for edits
     let productIdToEdit, index;
     if(location.search.length > 0) {
         productIdToEdit = location.search.substring(1, location.search.length);
         index = getIndex(productIdToEdit);
         
-        console.log(index);
         const oneObject = productsArray[index];
         productName.value = oneObject.productName;
         productDescription.value = oneObject.productDescription;
@@ -159,11 +164,10 @@ const addOrEditProduct = function() {
 const viewProduct = function(isSort) {
 
     let productContainer = document.querySelector(".product-container");
-    let messageForNoProduct = document.querySelector(".product-container p");
     if(isSort) {
         productContainer.innerHTML = "";
     } else if(productsArray.length === 0) {
-        messageForNoProduct.innerHTML = "No products are available";
+        generateMessage();
     }
 
     // get all keys
@@ -179,14 +183,20 @@ const filterProduct = function() {
     const index = getIndex(idFromInput);
     productContainer.innerHTML = createCard(productsArray[index]);
 
-    visisbleButton();
+    visisbleButton("clear filter");
 }
 const deleteProduct = function(clickedButtonId, productCard) {
     if(localStorage.length > 0) {
         const index = getIndex(clickedButtonId);
+
         productsArray.splice(index, 1);
         localStorage.removeItem(clickedButtonId);
         productCard.remove();
+
+        if(productsArray.length === 0) {
+            generateMessage();
+        }
+
     } else {
         showError("localstorage is empty");
     }
@@ -235,6 +245,6 @@ if(url === "/index.html") {
     viewProduct(false);
     remainFunctionality();
 } else if(url === "/create.html") {
-    visisbleButton();
+    visisbleButton("view product");
     addOrEditProduct();
 }
