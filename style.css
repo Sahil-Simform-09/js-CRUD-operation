@@ -132,8 +132,10 @@ svg, svg *{
     display: flex;
     justify-content: center; 
 }
-form img {
+.edit-img {
     display: none;
+    width: 200px;
+    height: 100px;
 }
 form {
     flex-direction: column;
@@ -143,7 +145,7 @@ form {
     background-color: rgba(161, 150, 150, 0.103);
     padding: 2%;
 }
-form p, label {
+form p, label, .message-for-empty {
     color: brown;
     font-size: 2rem;
 }

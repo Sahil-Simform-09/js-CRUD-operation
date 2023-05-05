@@ -9,6 +9,14 @@ const fillArray = function() {
     }
 }
 fillArray();
+const getIndex = function(id) {
+    return productsArray.findIndex(object => {
+        if(object.productId === id) {
+            return true;
+        }
+    });
+}
+
 // validation function
 const showError = function(error) { 
     console.log(error);
@@ -31,7 +39,7 @@ const valid = function(product) {
     });
 }
 
-// genrate umique Id
+// genrate unique Id
 const genrateId = function() {
     return Date.now();
 }
@@ -41,80 +49,6 @@ const bytesToMegabytes = function(bytes) {
     return megabytes;
 }
 
-
-const addOrEditProduct = function() {
-    
-    const productForm = document.querySelector(".create-product");
-    let productName = document.getElementById("product-name"), 
-        productDescription = document.getElementById("product-description"), 
-        productPrice = document.getElementById("product-price"), 
-        productImage = document.getElementById("product-image");
-
-    //check form is for edit
-    let productIdToEdit, index;
-    if(location.search.length > 0) {
-        productIdToEdit = location.search.substring(1, location.search.length);
-        index = productsArray.findIndex(object => {
-            return object.productId === productIdToEdit;
-        });
-        const oneObject = productsArray.splice(index, 1)[0];
-        productName.value = oneObject.productName;
-        productDescription.value = oneObject.productDescription;
-        productPrice.value = oneObject.productPrice;
-        
-
-        let imageToEdit = document.querySelector("form img");
-        imageToEdit.style.display = "block";
-        imageToEdit.src =  oneObject.productImageUrl;
-
-        let submitButton = document.querySelector(".submit");
-        submitButton.innerHTML = "Update Product";
-    }
-
-    const formName = document.querySelector("form p");
-    formName.innerHTML = "Edit Product Here";
-
-    
-    productForm.addEventListener("submit", event => {
-
-        event.preventDefault();
-        // get all details for a product
-        productName = productName.value;
-        productDescription = productDescription.value;
-        productPrice = Number(productPrice.value);
-        productImage = productImage.files[0];
-        messageDiv = document.querySelector(".message");
-        productId = productIdToEdit !== undefined ? productIdToEdit : genrateId();
-        product = {};
-        productProxy = valid(product);
-
-        //set properties to object
-        productProxy.productName = productName;
-        productProxy.productDescription = productDescription;
-        productProxy.productId = productId;
-        productProxy.productPrice = productPrice;
-
-        const reader = new FileReader();
-        reader.readAsDataURL(productImage);
-
-        reader.addEventListener('load', () => {
-            // Get the data URL of the image file
-            const imageURL = reader.result;
-            productProxy.productImageUrl = imageURL;  
-            
-            localStorage.setItem(productId.toString(), JSON.stringify(product));
-            productsArray.push(product);
-
-            const message = document.querySelector(".message");
-            message.innerHTML = productIdToEdit !== undefined ? "Product updated successfully" : "Product added successfully";
-            message.style.display = "block";
-            setTimeout(() => {
-                message.style.display = "none";
-            }, 1500);
-        });
-
-    });
-}
 const createCard = function(oneProduct) {
 
     // add product into productsArray
@@ -138,32 +72,9 @@ const createCard = function(oneProduct) {
             </div>
         </div>`;
 }
-const viewProduct = function(isSort) {
-
-    let productContainer = document.querySelector(".product-container");
-    if(isSort) {
-        productContainer.innerHTML = "";
-    }
-    // get all keys
-    productsArray.forEach( product => {
-        const productCardOne = createCard(product);
-        productContainer.innerHTML += productCardOne;
-    });
-}
 const visisbleButton = function() {
     const viewProductButton = document.querySelector(".view");
     viewProductButton.style.display = "block";
-}
-const filterProduct = function() {
-    let productContainer = document.querySelector(".product-container");
-    let idFromInput = document.querySelector(".filter input").value;
-    
-    const index = productsArray.findIndex(object => {
-        return object.productId === idFromInput;
-    });
-    productContainer.innerHTML = createCard(productsArray.splice(index, 1)[0]);
-
-    visisbleButton();
 }
 const getclickedButton = function(event) {
     const clickedButton = event.target;
@@ -175,7 +86,112 @@ const getclickedButton = function(event) {
 const sortProducts = function(byWhich) {
     productsArray.sort((a,b) => (a[byWhich] > b[byWhich]) ? 1 : ((b[byWhich] > a[byWhich]) ? -1 : 0));
 }
-const functionality = function() {
+
+// main functionality for CRUD operation
+const addOrEditProduct = function() {
+    
+    const productForm = document.querySelector(".create-product");
+    let productName = document.getElementById("product-name"), 
+        productDescription = document.getElementById("product-description"), 
+        productPrice = document.getElementById("product-price"), 
+        productImage = document.getElementById("product-image");
+
+    //check form is for edit
+    let productIdToEdit, index;
+    if(location.search.length > 0) {
+        productIdToEdit = location.search.substring(1, location.search.length);
+        index = getIndex(productIdToEdit);
+        
+        console.log(index);
+        const oneObject = productsArray[index];
+        productName.value = oneObject.productName;
+        productDescription.value = oneObject.productDescription;
+        productPrice.value = oneObject.productPrice;
+
+        let imageToEdit = document.querySelector("form img");
+        imageToEdit.style.display = "block";
+        imageToEdit.src =  oneObject.productImageUrl;
+
+        let submitButton = document.querySelector(".submit");
+        submitButton.innerHTML = "Update Product";
+
+        let formName = document.querySelector("form p");
+        formName.innerHTML = "Edit Product Here";
+    }
+ 
+    productForm.addEventListener("submit", event => {
+
+        event.preventDefault();
+
+        productPrice = Number(productPrice.value);
+        messageDiv = document.querySelector(".message");
+        productId = productIdToEdit !== undefined ? productIdToEdit : genrateId().toString();
+        product = {};
+        productProxy = valid(product);
+
+        //set properties to object
+        productProxy.productName = productName.value;;
+        productProxy.productDescription = productDescription.value;;
+        productProxy.productId = productId;
+        productProxy.productPrice = productPrice;
+
+        const reader = new FileReader();
+        reader.readAsDataURL(productImage.files[0]);
+
+        reader.addEventListener('load', () => {
+            // Get the data URL of the image file
+            const imageURL = reader.result;
+            productProxy.productImageUrl = imageURL;  
+            
+            localStorage.setItem(productId.toString(), JSON.stringify(product));
+            productsArray.push(product);
+
+            const message = document.querySelector(".message");
+            message.innerHTML = productIdToEdit !== undefined ? "Product updated successfully" : "Product added successfully";
+            message.style.display = "block";
+            setTimeout(() => {
+                message.style.display = "none";
+            }, 1500);
+        });
+
+    });
+}
+const viewProduct = function(isSort) {
+
+    let productContainer = document.querySelector(".product-container");
+    let messageForNoProduct = document.querySelector(".product-container p");
+    if(isSort) {
+        productContainer.innerHTML = "";
+    } else if(productsArray.length === 0) {
+        messageForNoProduct.innerHTML = "No products are available";
+    }
+
+    // get all keys
+    productsArray.forEach( product => {
+        const productCardOne = createCard(product);
+        productContainer.innerHTML += productCardOne;
+    });
+}
+const filterProduct = function() {
+    let productContainer = document.querySelector(".product-container");
+    let idFromInput = document.querySelector(".filter input").value;
+    
+    const index = getIndex(idFromInput);
+    productContainer.innerHTML = createCard(productsArray[index]);
+
+    visisbleButton();
+}
+const deleteProduct = function(clickedButtonId, productCard) {
+    if(localStorage.length > 0) {
+        const index = getIndex(clickedButtonId);
+        productsArray.splice(index, 1);
+        localStorage.removeItem(clickedButtonId);
+        productCard.remove();
+    } else {
+        showError("localstorage is empty");
+    }
+}
+const remainFunctionality = function() {
     let viewProductContainer = document.querySelector(".view-product");
     viewProductContainer.addEventListener("click", event => {;
         const clickedButton =  getclickedButton(event);
@@ -213,24 +229,11 @@ const functionality = function() {
         }
     });
 }
-const deleteProduct = function(clickedButtonId, productCard) {
-    if(localStorage.length > 0) {
-        const productToDelete = JSON.parse(localStorage.getItem(clickedButtonId));
-        const index = productsArray.findIndex(object => {
-            return object.productId === clickedButtonId;
-        });
-        productsArray.splice(index, 1);
-        localStorage.removeItem(clickedButtonId);
-        productCard.remove();
-    } else {
-        showError("localstorage is empty");
-    }
-}
 
 const url = window.location.pathname;
 if(url === "/index.html") {
     viewProduct(false);
-    functionality();
+    remainFunctionality();
 } else if(url === "/create.html") {
     visisbleButton();
     addOrEditProduct();
