@@ -8,29 +8,27 @@ const fillArray = function() {
         });
     }
 
-    // productsArray.sort((a, b) => b.productId - a.productId);
-    console.log(productsArray);
+    productsArray.sort((a, b) => b.productId - a.productId);
 }
 fillArray();
-const getIndex = function(id) {
-    return productsArray.findIndex(object => {
-        if(object.productId === id) {
-            return true;
-        }
-    });
-}
-
 // validation function
 const showError = function(error) { 
     console.log(error);
 }
-const notificationMessage = function(msg, msgContainer) {
+const notificationMessage = function(msg, msgContainer, timer, isFilterMessage) {
     const message = document.querySelector(msgContainer);
+
+    if(isFilterMessage) {
+        message.style.height = "100px";
+        message.style.backgroundColor = "rgba(161, 150, 150, 0.212)";
+        message.style.color = "red";
+    }
+
     message.style.display = "block";
     message.innerHTML = msg;
     setTimeout(() => {
         message.style.display = "none";
-    }, 2000);
+    }, timer);
 }
 const valid = function(product) {
     return new Proxy(product, {
@@ -50,16 +48,34 @@ const valid = function(product) {
     });
 }
 
-// genrate unique Id
+// genrate 
 const genrateId = function() {
     return Date.now();
+}
+const getIndex = function(id) {
+    return productsArray.findIndex(object => {
+        if(object.productId === id) {
+            return true;
+        }
+    });
 }
 const generateMessage = function(message) {
     let messageForNoProduct = document.querySelector(".product-container p");
     messageForNoProduct.innerHTML = "No products are available";
 }
+const visisbleButton = function(message) {
+    const viewProductButton = document.querySelector(".view");
+    viewProductButton.style.display = "block";
 
-
+    document.querySelector(".view button a").innerHTML = message;
+}
+const getclickedButton = function(event) {
+    const clickedButton = event.target;
+    if(clickedButton.id === "sort") {
+        return  document.getElementById("sort").value;
+    }
+    return clickedButton.id;
+}
 const createCard = function(oneProduct) {
 
     // add product into productsArray
@@ -83,19 +99,8 @@ const createCard = function(oneProduct) {
             </div>
         </div>`;
 }
-const visisbleButton = function(message) {
-    const viewProductButton = document.querySelector(".view");
-    viewProductButton.style.display = "block";
 
-    document.querySelector(".view button a").innerHTML = message;
-}
-const getclickedButton = function(event) {
-    const clickedButton = event.target;
-    if(clickedButton.id === "sort") {
-        return  document.getElementById("sort").value;
-    }
-    return clickedButton.id;
-}
+// sort function
 const sortProducts = function(byWhich) {
     productsArray.sort((a,b) => (a[byWhich] > b[byWhich]) ? 1 : ((b[byWhich] > a[byWhich]) ? -1 : 0));
 }
@@ -158,7 +163,7 @@ const addOrEditProduct = function() {
             localStorage.setItem(productId.toString(), JSON.stringify(product));
             productsArray.push(product);
 
-            notificationMessage(productIdToEdit !== undefined ? "Product updated successfully" : "Product added successfully", ".message");
+            notificationMessage(productIdToEdit !== undefined ? "Product updated successfully" : "Product added successfully", ".message", 2000);
          });
 
     });
@@ -183,9 +188,12 @@ const filterProduct = function() {
     let idFromInput = document.querySelector(".filter input").value;
     
     const index = getIndex(idFromInput);
-    productContainer.innerHTML = createCard(productsArray[index]);
-
-    visisbleButton("clear filter");
+    if(index === -1) {
+        notificationMessage(`Sorry, we could not find a product with that ${idFromInput} index. Please check the index and try again.` ,".delete-message", 6000, true);
+    } else {
+        productContainer.innerHTML = createCard(productsArray[index]);
+        visisbleButton("clear filter");
+    }
 }
 const deleteProduct = function(clickedButtonId, productCard) {
     if(localStorage.length > 0) {
@@ -199,7 +207,7 @@ const deleteProduct = function(clickedButtonId, productCard) {
         productCard.remove();
 
         if(productsArray.length === arrayLen - 1 && localStorage.length === localstorageLen - 1) {
-            notificationMessage("Product deleted successfully", ".delete-message");
+            notificationMessage("Product deleted successfully", ".delete-message", 2000);
         } else {
             console.log(productsArray.length + " " + arrayLen);
             console.log(localstorageLen.length + " " + localstorageLen);
