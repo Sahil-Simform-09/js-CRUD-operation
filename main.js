@@ -2,9 +2,9 @@
 const productsArray = [];
 const fillArray = function() {
     if(productsArray.length === 0) {
-        let keys = Object.keys(localStorage);
+        let keys = Object.keys(sessionStorage);
         keys.forEach( key => {
-            productsArray.push(JSON.parse(localStorage.getItem(key)));
+            productsArray.push(JSON.parse(sessionStorage.getItem(key)));
         });
     }
 
@@ -172,7 +172,7 @@ const addOrEditProduct = function() {
             const imageURL = reader.result;
             productProxy.productImageUrl = imageURL;  
             
-            localStorage.setItem(productId.toString(), JSON.stringify(product));
+            sessionStorage.setItem(productId.toString(), JSON.stringify(product));
             productsArray.push(product);
 
             notificationMessage(productIdToEdit !== undefined ? "Product updated successfully" : "Product added successfully", ".message", 2000);
@@ -207,21 +207,19 @@ const filterProduct = function() {
     }
 }
 const deleteProduct = function(clickedButtonId, productCard) {
-    if(localStorage.length > 0) {
+    if(sessionStorage.length > 0) {
 
-        const arrayLen =  productsArray.length, localstorageLen = localStorage.length;
+        const arrayLen =  productsArray.length, sessionStorageLen = sessionStorage.length;
         productsArray.length;
         const index = getIndex(clickedButtonId);
 
         productsArray.splice(index, 1);
-        localStorage.removeItem(clickedButtonId);
+        sessionStorage.removeItem(clickedButtonId);
         productCard.remove();
 
-        if(productsArray.length === arrayLen - 1 && localStorage.length === localstorageLen - 1) {
+        if(productsArray.length === arrayLen - 1 && sessionStorage.length === sessionStorageLen - 1) {
             notificationMessage("Product deleted successfully", ".delete-message", 2000);
         } else {
-            console.log(productsArray.length + " " + arrayLen);
-            console.log(localstorageLen.length + " " + localstorageLen);
             showError("Product is not deleted successfully");
         }
 
