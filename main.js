@@ -7,6 +7,9 @@ const fillArray = function() {
             productsArray.push(JSON.parse(localStorage.getItem(key)));
         });
     }
+
+    // productsArray.sort((a, b) => b.productId - a.productId);
+    console.log(productsArray);
 }
 fillArray();
 const getIndex = function(id) {
@@ -20,6 +23,14 @@ const getIndex = function(id) {
 // validation function
 const showError = function(error) { 
     console.log(error);
+}
+const notificationMessage = function(msg, msgContainer) {
+    const message = document.querySelector(msgContainer);
+    message.style.display = "block";
+    message.innerHTML = msg;
+    setTimeout(() => {
+        message.style.display = "none";
+    }, 2000);
 }
 const valid = function(product) {
     return new Proxy(product, {
@@ -47,11 +58,7 @@ const generateMessage = function(message) {
     let messageForNoProduct = document.querySelector(".product-container p");
     messageForNoProduct.innerHTML = "No products are available";
 }
-// convert byte to megabyte
-// const bytesToMegabytes = function(bytes) {
-//     const megabytes = bytes / (1024 * 1024);
-//     return megabytes;
-// }
+
 
 const createCard = function(oneProduct) {
 
@@ -151,13 +158,8 @@ const addOrEditProduct = function() {
             localStorage.setItem(productId.toString(), JSON.stringify(product));
             productsArray.push(product);
 
-            const message = document.querySelector(".message");
-            message.innerHTML = productIdToEdit !== undefined ? "Product updated successfully" : "Product added successfully";
-            message.style.display = "block";
-            setTimeout(() => {
-                message.style.display = "none";
-            }, 1500);
-        });
+            notificationMessage(productIdToEdit !== undefined ? "Product updated successfully" : "Product added successfully", ".message");
+         });
 
     });
 }
@@ -187,11 +189,22 @@ const filterProduct = function() {
 }
 const deleteProduct = function(clickedButtonId, productCard) {
     if(localStorage.length > 0) {
+
+        const arrayLen =  productsArray.length, localstorageLen = localStorage.length;
+        productsArray.length;
         const index = getIndex(clickedButtonId);
 
         productsArray.splice(index, 1);
         localStorage.removeItem(clickedButtonId);
         productCard.remove();
+
+        if(productsArray.length === arrayLen - 1 && localStorage.length === localstorageLen - 1) {
+            notificationMessage("Product deleted successfully", ".delete-message");
+        } else {
+            console.log(productsArray.length + " " + arrayLen);
+            console.log(localstorageLen.length + " " + localstorageLen);
+            showError("Product is not deleted successfully");
+        }
 
         if(productsArray.length === 0) {
             generateMessage();

@@ -122,7 +122,7 @@ svg, svg *{
     padding: 5px;
     font-size: 1.5rem;
 }
-.message {
+.message, .delete-message {
     background-color: rgb(94, 182, 94);
     color: white;
     width: 300px;
@@ -131,6 +131,11 @@ svg, svg *{
     display: none;
     font-size: 1.5rem;
     padding: 3px;
+}
+.delete-message {
+    margin-top: 300px;
+    width: 250px;
+    margin-left: -10px;
 }
 .view {
     display: none;
@@ -188,4 +193,3 @@ button {
     font-size: 1rem;
     cursor: pointer;
 } 
-
