@@ -108,7 +108,7 @@ const sortProducts = function(byWhich) {
 // main functionality for CRUD operation
 const addOrEditProduct = function() {
     
-    const productForm = document.querySelector(".create-product");
+    let productForm = document.querySelector(".create-product");
     let productName = document.getElementById("product-name"), 
         productDescription = document.getElementById("product-description"), 
         productPrice = document.getElementById("product-price"), 
@@ -124,6 +124,18 @@ const addOrEditProduct = function() {
         productName.value = oneObject.productName;
         productDescription.value = oneObject.productDescription;
         productPrice.value = oneObject.productPrice;
+
+        fetch(oneObject.productImageUrl)
+        .then( res => res.blob() )
+        .then( blob => {
+            const imageFile = new File([blob], oneObject.productName + "-image", { type: blob.type});
+            const dataTransfer = new DataTransfer();
+            console.log(dataTransfer.items);
+            dataTransfer.items.add(imageFile);
+            console.log(dataTransfer.files);
+
+            productImage.files = imageFile;
+        });
 
         let imageToEdit = document.querySelector("form img");
         imageToEdit.style.display = "block";
@@ -147,8 +159,8 @@ const addOrEditProduct = function() {
         productProxy = valid(product);
 
         //set properties to object
-        productProxy.productName = productName.value;;
-        productProxy.productDescription = productDescription.value;;
+        productProxy.productName = productName.value;
+        productProxy.productDescription = productDescription.value;
         productProxy.productId = productId;
         productProxy.productPrice = productPrice;
 
@@ -169,7 +181,6 @@ const addOrEditProduct = function() {
     });
 }
 const viewProduct = function(isSort) {
-
     let productContainer = document.querySelector(".product-container");
     if(isSort) {
         productContainer.innerHTML = "";
