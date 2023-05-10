@@ -15,10 +15,10 @@ fillArray();
 const showError = function(error) { 
     console.log(error);
 }
-const notificationMessage = function(msg, msgContainer, timer, isFilterMessage) {
+const notificationMessage = function(msg, msgContainer, timer, isError) {
     const message = document.querySelector(msgContainer);
 
-    if(isFilterMessage) {
+    if(isError) {
         message.style.height = "100px";
         message.style.backgroundColor = "rgba(161, 150, 150, 0.212)";
         message.style.color = "red";
@@ -39,7 +39,7 @@ const valid = function(product) {
         },
         set: function(obj, prop, value) {
             if(prop === "productPrice" && typeof value !== "number") {
-                showError(`please provide numeric value for ${prop} property`);
+                showError(`please provide numeric value for ${prop} property`, ".delete-message", 2000, true);
             }
             else {
                 obj[prop] = value;
@@ -103,16 +103,17 @@ const createCard = function(oneProduct) {
 // sort function
 const sortProducts = function(byWhich) {
     productsArray.sort((a,b) => (a[byWhich] > b[byWhich]) ? 1 : ((b[byWhich] > a[byWhich]) ? -1 : 0));
+    visisbleButton("clear sort");
 }
 
 // main functionality for CRUD operation
 const addOrEditProduct = function() {
     
     let productForm = document.querySelector(".create-product");
-    let productName = document.getElementById("product-name"), 
-        productDescription = document.getElementById("product-description"), 
-        productPrice = document.getElementById("product-price"), 
-        productImage = document.getElementById("product-image");
+    let name = document.getElementById("product-name"), 
+        description = document.getElementById("product-description"), 
+        price = document.getElementById("product-price"), 
+        image = document.getElementById("product-image");
 
     //check form is for edits
     let productIdToEdit, index;
@@ -121,20 +122,17 @@ const addOrEditProduct = function() {
         index = getIndex(productIdToEdit);
         
         const oneObject = productsArray[index];
-        productName.value = oneObject.productName;
-        productDescription.value = oneObject.productDescription;
-        productPrice.value = oneObject.productPrice;
+        name.value = oneObject.productName;
+        description.value = oneObject.productDescription;
+        price.value = oneObject.productPrice;
 
         fetch(oneObject.productImageUrl)
         .then( res => res.blob() )
         .then( blob => {
             const imageFile = new File([blob], oneObject.productName + "-image", { type: blob.type});
             const dataTransfer = new DataTransfer();
-            console.log(dataTransfer.items);
             dataTransfer.items.add(imageFile);
-            console.log(dataTransfer.files);
-
-            productImage.files = imageFile;
+            image.files = dataTransfer.files;
         });
 
         let imageToEdit = document.querySelector("form img");
@@ -152,30 +150,31 @@ const addOrEditProduct = function() {
 
         event.preventDefault();
 
-        productPrice = Number(productPrice.value);
         messageDiv = document.querySelector(".message");
-        productId = productIdToEdit !== undefined ? productIdToEdit : genrateId().toString();
+        id = productIdToEdit !== undefined ? productIdToEdit : genrateId().toString();
         product = {};
         productProxy = valid(product);
 
         //set properties to object
-        productProxy.productName = productName.value;
-        productProxy.productDescription = productDescription.value;
-        productProxy.productId = productId;
-        productProxy.productPrice = productPrice;
+        productProxy.productName = name.value;
+        productProxy.productDescription = description.value;
+        productProxy.productId = id;
+        productProxy.productPrice = Number(price.value);;
 
         const reader = new FileReader();
-        reader.readAsDataURL(productImage.files[0]);
+        reader.readAsDataURL(image.files[0]);
 
         reader.addEventListener('load', () => {
             // Get the data URL of the image file
             const imageURL = reader.result;
             productProxy.productImageUrl = imageURL;  
             
-            localStorage.setItem(productId.toString(), JSON.stringify(product));
+            localStorage.setItem(id.toString(), JSON.stringify(product));
             productsArray.push(product);
 
             notificationMessage(productIdToEdit !== undefined ? "Product updated successfully" : "Product added successfully", ".message", 2000);
+
+            productForm.reset();
          });
 
     });
@@ -222,7 +221,7 @@ const deleteProduct = function(clickedButtonId, productCard) {
         if(productsArray.length === arrayLen - 1 && localStorage.length === localStorageLen - 1) {
             notificationMessage("Product deleted successfully", ".delete-message", 2000);
         } else {
-            showError("Product is not deleted successfully");
+            notificationMessage("Product is not deleted successfully", ".delete-message", 2000);
         }
 
         if(productsArray.length === 0) {
