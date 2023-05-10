@@ -115,6 +115,7 @@ const addOrEditProduct = function() {
         price = document.getElementById("product-price"), 
         image = document.getElementById("product-image");
 
+    let imageToEdit = document.querySelector("form img");
     //check form is for edits
     let productIdToEdit, index;
     if(location.search.length > 0) {
@@ -135,7 +136,6 @@ const addOrEditProduct = function() {
             image.files = dataTransfer.files;
         });
 
-        let imageToEdit = document.querySelector("form img");
         imageToEdit.style.display = "block";
         imageToEdit.src =  oneObject.productImageUrl;
 
@@ -175,6 +175,7 @@ const addOrEditProduct = function() {
             notificationMessage(productIdToEdit !== undefined ? "Product updated successfully" : "Product added successfully", ".message", 2000);
 
             productForm.reset();
+            imageToEdit.style.display = "none";
          });
 
     });
