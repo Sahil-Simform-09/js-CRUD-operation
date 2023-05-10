@@ -2,9 +2,9 @@
 const productsArray = [];
 const fillArray = function() {
     if(productsArray.length === 0) {
-        let keys = Object.keys(sessionStorage);
+        let keys = Object.keys(localStorage);
         keys.forEach( key => {
-            productsArray.push(JSON.parse(sessionStorage.getItem(key)));
+            productsArray.push(JSON.parse(localStorage.getItem(key)));
         });
     }
 
@@ -172,7 +172,7 @@ const addOrEditProduct = function() {
             const imageURL = reader.result;
             productProxy.productImageUrl = imageURL;  
             
-            sessionStorage.setItem(productId.toString(), JSON.stringify(product));
+            localStorage.setItem(productId.toString(), JSON.stringify(product));
             productsArray.push(product);
 
             notificationMessage(productIdToEdit !== undefined ? "Product updated successfully" : "Product added successfully", ".message", 2000);
@@ -180,6 +180,7 @@ const addOrEditProduct = function() {
 
     });
 }
+
 const viewProduct = function(isSort) {
     let productContainer = document.querySelector(".product-container");
     if(isSort) {
@@ -194,6 +195,7 @@ const viewProduct = function(isSort) {
         productContainer.innerHTML += productCardOne;
     });
 }
+
 const filterProduct = function() {
     let productContainer = document.querySelector(".product-container");
     let idFromInput = document.querySelector(".filter input").value;
@@ -207,17 +209,17 @@ const filterProduct = function() {
     }
 }
 const deleteProduct = function(clickedButtonId, productCard) {
-    if(sessionStorage.length > 0) {
+    if(localStorage.length > 0) {
 
-        const arrayLen =  productsArray.length, sessionStorageLen = sessionStorage.length;
+        const arrayLen =  productsArray.length, localStorageLen = localStorage.length;
         productsArray.length;
         const index = getIndex(clickedButtonId);
 
         productsArray.splice(index, 1);
-        sessionStorage.removeItem(clickedButtonId);
+        localStorage.removeItem(clickedButtonId);
         productCard.remove();
 
-        if(productsArray.length === arrayLen - 1 && sessionStorage.length === sessionStorageLen - 1) {
+        if(productsArray.length === arrayLen - 1 && localStorage.length === localStorageLen - 1) {
             notificationMessage("Product deleted successfully", ".delete-message", 2000);
         } else {
             showError("Product is not deleted successfully");
