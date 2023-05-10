@@ -273,7 +273,7 @@ const remainFunctionality = function() {
 }
 
 const url = window.location.pathname;
-if(url === "/index.html") {
+if(url === "/index.html" || url === "/") {
     viewProduct(false);
     remainFunctionality();
 } else if(url === "/create.html") {
